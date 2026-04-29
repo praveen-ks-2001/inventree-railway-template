@@ -3,6 +3,9 @@ set -e
 
 cd /home/inventree
 
+echo "[start.sh] Running invoke update (migrations + collectstatic)..."
+invoke update
+
 echo "[start.sh] Starting gunicorn in background on ${INVENTREE_WEB_ADDR}:${INVENTREE_WEB_PORT}..."
 gunicorn -c ./gunicorn.conf.py InvenTree.wsgi \
   -b ${INVENTREE_WEB_ADDR}:${INVENTREE_WEB_PORT} \
