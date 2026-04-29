@@ -1,13 +1,16 @@
 #!/bin/bash
 set -e
 
-echo "[start.sh] Launching InvenTree gunicorn server in background..."
-invoke server &
+cd /home/inventree
 
-echo "[start.sh] Waiting for gunicorn to be ready on 127.0.0.1:8000..."
+echo "[start.sh] Starting gunicorn in background on ${INVENTREE_WEB_ADDR}:${INVENTREE_WEB_PORT}..."
+gunicorn -c ./gunicorn.conf.py InvenTree.wsgi \
+  -b ${INVENTREE_WEB_ADDR}:${INVENTREE_WEB_PORT} \
+  --chdir ${INVENTREE_BACKEND_DIR}/InvenTree &
+
+echo "[start.sh] Waiting for gunicorn to be ready..."
 for i in $(seq 1 60); do
-  if curl -sf -o /dev/null http://127.0.0.1:8000/api/ 2>&1 || \
-     curl -sf -o /dev/null http://127.0.0.1:8000/ 2>&1; then
+  if curl -sf -o /dev/null http://${INVENTREE_WEB_ADDR}:${INVENTREE_WEB_PORT}/api/ 2>&1; then
     echo "[start.sh] Gunicorn is up"
     break
   fi
